@@ -12,11 +12,11 @@ on:
 
 jobs:
   pack-and-upload:
-    runs-on: ubuntu-latest # Use a standard GitHub-hosted runner
+    runs-on: ubuntu-latest # We can still use the standard amd64 runner
     steps:
-      # Step 1: Pull the requested Docker image
-      - name: Pull Docker Image
-        run: docker pull ${{ github.event.inputs.image_name }}
+      # Step 1: Pull the Docker image FOR THE CORRECT PLATFORM
+      - name: Pull Docker Image (ARM64)
+        run: docker pull --platform linux/arm64 ${{ github.event.inputs.image_name }}
 
       # Step 2: Save the image to a .tar file
       - name: Save Docker Image to tar
@@ -26,5 +26,5 @@ jobs:
       - name: Upload image.tar as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: docker-image
+          name: docker-image-arm64 # Renamed artifact for clarity
           path: image.tar
