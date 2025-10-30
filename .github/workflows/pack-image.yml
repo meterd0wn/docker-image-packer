@@ -1,0 +1,30 @@
+# This name will appear in the GitHub Actions UI
+name: Package Docker Image
+
+# This allows you to run the workflow manually from the Actions tab
+on:
+  workflow_dispatch:
+    inputs:
+      image_name:
+        description: 'The Docker image to pack (e.g., ubuntu:22.04)'
+        required: true
+        default: 'ubuntu:22.04'
+
+jobs:
+  pack-and-upload:
+    runs-on: ubuntu-latest # Use a standard GitHub-hosted runner
+    steps:
+      # Step 1: Pull the requested Docker image
+      - name: Pull Docker Image
+        run: docker pull ${{ github.event.inputs.image_name }}
+
+      # Step 2: Save the image to a .tar file
+      - name: Save Docker Image to tar
+        run: docker save -o image.tar ${{ github.event.inputs.image_name }}
+
+      # Step 3: Upload the .tar file as a downloadable artifact
+      - name: Upload image.tar as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: image.tar
